@@ -11,5 +11,11 @@ class MyResource
     @waiting_list = []
   end
 
+  def allocate(demand)
+    @free -= demand
+  end
 
+  def queue(process, demand)
+    waiting_list.push([process, demand])
+  end
 end

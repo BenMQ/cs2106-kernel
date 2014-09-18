@@ -34,6 +34,18 @@ class MyProcess
     @status_list.current = self
   end
 
+  def req(resource, demand)
+    if resource.free >= demand
+      resource.allocate(demand)
+      @other_resources.push(resource)
+    else
+      @status = :blocked
+      @status_list.remove(self)
+      @status_list = resource.waiting_list
+      resource.queue(self, demand)
+    end
+  end
+
   def to_s
     return "#{@pid} (#{@priority}): #{@status}"
   end
