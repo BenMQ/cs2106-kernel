@@ -7,4 +7,5 @@ init = InitProcess.new
 ready_list.add(init)
 init.run
 
+init.timeout
 ready_list.debug

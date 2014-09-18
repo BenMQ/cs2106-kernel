@@ -23,6 +23,12 @@ class MyProcess
     @children.push(child)
   end
 
+  def timeout
+    @status = :ready
+    @status_list.remove(self)
+    @status_list.add(self)
+  end
+
   def run
     @status = :running
     @status_list.current = self
