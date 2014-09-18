@@ -5,6 +5,7 @@ class MyProcess
   # Initialise a process with given pid, priority and (optionally) a parent
   # The newly created process has a default status of ready
   def initialize(pid, priority, parent)
+    #TODO: check for duplicate PID, erroneous priority
     @pid = pid
     @other_resources = []
     @status = :ready
@@ -20,6 +21,11 @@ class MyProcess
   # Add a child to a parent process
   def add_child(child)
     @children.push(child)
+  end
+
+  def run
+    @status = :running
+    @status_list.current = self
   end
 
   def to_s

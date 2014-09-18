@@ -1,10 +1,11 @@
 require_relative 'const'
 class ReadyList
-  attr_accessor :lists
+  attr_accessor :lists, :current
 
   # Initialise a ready list, with priority level set in Const::MAX_PRIORITY
   def initialize
     @lists = Array.new(Const::MAX_PRIORITY + 1) {Array.new}
+    @current = nil
   end
 
   # Add a new process to the ready list
@@ -15,7 +16,7 @@ class ReadyList
 
     priority = process.priority
     @lists[priority].push(process)
-    process.status_list = @lists[priority]
+    process.status_list = self
   end
 
   # Remove a given process from the ready list
@@ -29,5 +30,6 @@ class ReadyList
     @lists.each_with_index do |list, index|
       puts "Priority #{index}: #{list.to_s}"
     end
+    puts "Currently running: #{current}"
   end
 end
