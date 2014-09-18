@@ -37,13 +37,21 @@ class MyProcess
   def req(resource, demand)
     if resource.free >= demand
       resource.allocate(demand)
-      @other_resources.push(resource)
+      @other_resources.push([resource, demand])
     else
       @status = :blocked
       @status_list.remove(self)
       @status_list = resource.waiting_list
       resource.queue(self, demand)
     end
+  end
+
+  # Release the resource that is currently allocated to the process
+  def release(resource)
+    # TODO: Check if resource is allocated to this process currently
+    allocated = @other_resources.select { |alloc| alloc[0] == resource }
+    allocated.each { |alloc| resource.release(alloc[1]) }
+    @other_resources.delete_if { |alloc| alloc[0] == resource }
   end
 
   def to_s

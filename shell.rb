@@ -13,6 +13,11 @@ init.run
 
 # init.timeout
 
-init.req(r1, 2)
+init.req(r1, 1)
+
+puts r1
+
+init.release(r1)
+puts r1
 
 ready_list.debug

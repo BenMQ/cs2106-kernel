@@ -15,7 +15,19 @@ class MyResource
     @free -= demand
   end
 
+  def release(amount)
+    @free += amount
+  end
+
   def queue(process, demand)
     waiting_list.push([process, demand])
+  end
+
+  def to_s
+    return "#{rid}: #{free} / #{units}"
+  end
+
+  def inspect
+    to_s
   end
 end
