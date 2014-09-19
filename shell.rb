@@ -33,7 +33,13 @@ def create(pid, priority)
 end
 
 def destroy(pid)
-
+  target = MyProcess.get(pid)
+  current = $ready_list.current
+  if current.is_parent_of target
+    target.destroy
+  else
+    raise 'Target is not a child'
+  end
 end
 
 def to
@@ -53,7 +59,8 @@ end
 
 init
 create('x', 1)
-create('y', 1)
+create('y', 2)
+destroy('x')
 req('R1', 1)
 to
 req('R1', 1)

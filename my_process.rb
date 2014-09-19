@@ -42,6 +42,16 @@ class MyProcess
     @children.push(child)
   end
 
+  def is_parent_of(child)
+    if child.parent.nil?
+      false
+    elsif child == self
+      true
+    else
+      is_parent_of child.parent
+    end
+  end
+
   def timeout
     @status = :ready
     @status_list.remove(self)
