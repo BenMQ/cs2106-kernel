@@ -50,7 +50,7 @@ class MyResource
   # less than or equals to what is currently available
   def try_allocate_next
     while not @waiting_list.empty? and @waiting_list.first[1] <= @free do
-      first = @waiting_list.pop
+      first = @waiting_list.shift
       first[0].req(self, first[1])
       first[0].ready
     end

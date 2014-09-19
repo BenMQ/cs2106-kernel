@@ -48,10 +48,10 @@ class MyProcess
   # 1) Self is reached, hence it's a ancestor
   # 2) Nil is reached (root of the creation tree), hence it's not a ancestor
   def is_ancestor_of(child)
-    if child.parent.nil?
-      false
-    elsif child == self
+    if child == self
       true
+    elsif child.parent.nil?
+      false
     else
       is_ancestor_of child.parent
     end
@@ -74,8 +74,14 @@ class MyProcess
   end
 
   def destroy
-    # Recursively destroy children first
-    @children.each do |p|
+    # Recursively destroy children first.
+    # We have to make a copy of @children
+    # since the @children list is modified
+    # every time a child is deleted. We cannot
+    # iterate through it while concurrently
+    # modifying it
+    to_delete = @children.map {|x| x}
+    to_delete.each do |p|
       p.destroy
     end
 

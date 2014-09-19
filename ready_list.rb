@@ -26,7 +26,10 @@ class ReadyList
     end
   end
 
+  # Find the highest priority process
   def highest_priority
+    # Find first non empty priority level
+    # and return the first process
     @lists.reverse_each do |list|
       return list.first unless list.empty?
     end

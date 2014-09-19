@@ -22,6 +22,7 @@ def init
   scheduler
 end
 
+# Create process with PID and priority
 def cr(pid, priority)
   raise 'Invalid priority' unless priority.between?(1, Const::MAX_PRIORITY)
   current = $ready_list.current
@@ -31,18 +32,23 @@ def cr(pid, priority)
   scheduler
 end
 
+# Delete process PID
 def de(pid)
+  if pid == 'init'
+    raise 'Cannot delete init process'
+  end
   target = MyProcess.get(pid)
   current = $ready_list.current
   if current.is_ancestor_of target
     target.destroy
   else
-    raise 'Target is not a child'
+    raise 'Current process is not an ancestor of target'
   end
 
   scheduler
 end
 
+# Issue timeout to current process
 def to
   current = $ready_list.current
   current.timeout
@@ -50,6 +56,7 @@ def to
   scheduler
 end
 
+# Request x units of resources from RID
 def req(rid, units)
   current = $ready_list.current
   resource = MyResource.get(rid)
@@ -61,6 +68,7 @@ def req(rid, units)
   scheduler
 end
 
+# Release x units of resource from RID
 def rel(rid, units)
   current = $ready_list.current
   resource = MyResource.get(rid)
@@ -90,7 +98,7 @@ while line=gets
         puts ''
         init
     end
-  rescue
+  rescue Exception => e
     print 'error '
   end
 end
