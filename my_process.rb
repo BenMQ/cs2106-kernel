@@ -16,6 +16,10 @@ class MyProcess
     @@processes = {}
   end
 
+  def self.get(pid)
+    @@processes[pid]
+  end
+
   # Initialise a process with given pid, priority and (optionally) a parent
   # The newly created process has a default status of ready
   def initialize(pid, priority, parent)

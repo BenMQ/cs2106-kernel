@@ -8,8 +8,8 @@ class MyResource
   # is equal to the id of the resource
   def initialize(rid)
     @rid = rid
-    @units = rid.to_i
-    @free = rid.to_i
+    @units = rid[1..-1].to_i
+    @free = @units
     @waiting_list = []
     @@resources[rid] = self
   end
@@ -18,6 +18,10 @@ class MyResource
     (1..Const::RESOURCES).each do |n|
       self.new("R#{n}")
     end
+  end
+
+  def self.get(rid)
+    @@resources[rid]
   end
 
   def allocate(demand)
