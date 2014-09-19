@@ -1,6 +1,8 @@
+require_relative 'const'
 class MyResource
   attr_accessor :rid, :units, :free, :waiting_list
 
+  @@resources = {}
   # Initialise a new resource with a given id
   # The total number of units for this resource
   # is equal to the id of the resource
@@ -9,6 +11,13 @@ class MyResource
     @units = rid.to_i
     @free = rid.to_i
     @waiting_list = []
+    @@resources[rid] = self
+  end
+
+  def self.init
+    (1..Const::RESOURCES).each do |n|
+      self.new("R#{n}")
+    end
   end
 
   def allocate(demand)

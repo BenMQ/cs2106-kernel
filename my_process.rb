@@ -1,5 +1,6 @@
 class MyProcess
   @@ready_list = nil
+  @@processes = {}
   attr_accessor :pid, :other_resources, :status, :status_list, :parent, :children, :priority
 
   def self.ready_list=(ready_list)
@@ -8,6 +9,11 @@ class MyProcess
 
   def self.ready_list
     @@ready_list
+  end
+
+  def self.init(ready_list)
+    @@ready_list = ready_list
+    @@processes = {}
   end
 
   # Initialise a process with given pid, priority and (optionally) a parent
@@ -24,6 +30,7 @@ class MyProcess
 
     # Creation tree points both ways
     parent.add_child(self) unless parent.nil?
+    @@processes[pid] = self
   end
 
   # Add a child to a parent process
@@ -56,6 +63,7 @@ class MyProcess
     end
     @status = :destroyed
     @@ready_list.remove(self)
+    @@processes.delete(@pid)
   end
 
   def req(resource, demand)
@@ -72,6 +80,7 @@ class MyProcess
 
   # Release the resource that is currently allocated to the process
   def release(resource)
+    # FIXME: add number of units to be released
     # TODO: Check if resource is allocated to this process currently
     allocated = @other_resources.select { |alloc| alloc[0] == resource }
     allocated.each { |alloc| resource.release(alloc[1]) }
