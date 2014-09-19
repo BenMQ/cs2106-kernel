@@ -23,6 +23,17 @@ class MyResource
     waiting_list.push([process, demand])
   end
 
+  # Attempt to allocate resources to the next pending process
+  # in the waiting list, as long as the first process requires
+  # less than or equals to what is currently available
+  def try_allocate
+    while not @waiting_list.empty? and @waiting_list.first[1] <= @free do
+      first = @waiting_list.pop
+      first[0].req(self, first[1])
+      first[0].ready
+    end
+  end
+
   def to_s
     return "#{rid}: #{free} / #{units}"
   end

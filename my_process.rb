@@ -1,6 +1,14 @@
 class MyProcess
-
+  @@ready_list = nil
   attr_accessor :pid, :other_resources, :status, :status_list, :parent, :children, :priority
+
+  def self.ready_list=(ready_list)
+     @@ready_list = ready_list
+  end
+
+  def self.ready_list
+    @@ready_list
+  end
 
   # Initialise a process with given pid, priority and (optionally) a parent
   # The newly created process has a default status of ready
@@ -34,6 +42,12 @@ class MyProcess
     @status_list.current = self
   end
 
+  def ready
+    @status = :ready
+    @@ready_list.add(self)
+
+  end
+
   def req(resource, demand)
     if resource.free >= demand
       resource.allocate(demand)
@@ -52,6 +66,8 @@ class MyProcess
     allocated = @other_resources.select { |alloc| alloc[0] == resource }
     allocated.each { |alloc| resource.release(alloc[1]) }
     @other_resources.delete_if { |alloc| alloc[0] == resource }
+
+    resource.try_allocate
   end
 
   def to_s
