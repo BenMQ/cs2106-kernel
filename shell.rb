@@ -14,19 +14,28 @@ ready_list.add(init)
 init.run
 init.scheduler
 ready_list.add(p1)
+init.scheduler
+
+p2 = MyProcess.new('B', 1, p1)
+ready_list.add(p2)
+p1.scheduler
+p3 = MyProcess.new('C', 1, p2)
+ready_list.add(p3)
+p1.scheduler
+p1.destroy
 p1.scheduler
 
 # init.timeout
-
-init.req(r1, 1)
-init.scheduler
-p1.req(r1, 4)
-p1.scheduler
-puts p1
-puts r1
-
-init.release(r1)
-init.scheduler
-puts r1
+#
+# init.req(r1, 1)
+# init.scheduler
+# p1.req(r1, 4)
+# p1.scheduler
+# puts p1
+# puts r1
+#
+# init.release(r1)
+# init.scheduler
+# puts r1
 
 ready_list.debug

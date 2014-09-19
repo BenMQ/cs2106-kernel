@@ -45,7 +45,17 @@ class MyProcess
   def ready
     @status = :ready
     @@ready_list.add(self)
+  end
 
+  def destroy
+    @children.each do |p|
+      p.destroy
+    end
+    @other_resources.each do |r|
+      release(r)
+    end
+    @status = :destroyed
+    @@ready_list.remove(self)
   end
 
   def req(resource, demand)
@@ -72,7 +82,7 @@ class MyProcess
 
   def scheduler
     highest = @@ready_list.highest_priority
-    if @priority < highest.priority
+    if @priority < highest.priority || @status != :running
       if @status == :running
         timeout
       end
