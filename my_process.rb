@@ -70,6 +70,16 @@ class MyProcess
     resource.try_allocate
   end
 
+  def scheduler
+    highest = @@ready_list.highest_priority
+    if @priority < highest.priority
+      if @status == :running
+        timeout
+      end
+      highest.run
+    end
+  end
+
   def to_s
     return "#{@pid} (#{@priority}): #{@status}"
   end

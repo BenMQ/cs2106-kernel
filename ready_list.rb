@@ -26,6 +26,12 @@ class ReadyList
     end
   end
 
+  def highest_priority
+    @lists.reverse_each do |list|
+      return list.first unless list.empty?
+    end
+  end
+
   def debug
     @lists.each_with_index do |list, index|
       puts "Priority #{index}: #{list.to_s}"
