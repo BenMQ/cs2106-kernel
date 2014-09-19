@@ -3,39 +3,61 @@ require_relative 'init_process'
 require_relative 'my_resource'
 require_relative 'ready_list'
 
-ready_list = ReadyList.new
-MyProcess.ready_list = ready_list
-r1 = MyResource.new(4)
-r2 = MyResource.new(2)
 
-init = InitProcess.new
-p1 = MyProcess.new('A', 1, init)
-ready_list.add(init)
-init.run
-init.scheduler
-ready_list.add(p1)
-init.scheduler
+$ready_list = nil
 
-p2 = MyProcess.new('B', 1, p1)
-ready_list.add(p2)
-p1.scheduler
-p3 = MyProcess.new('C', 1, p2)
-ready_list.add(p3)
-p1.scheduler
-p1.destroy
-p1.scheduler
 
-# init.timeout
-#
-# init.req(r1, 1)
-# init.scheduler
-# p1.req(r1, 4)
-# p1.scheduler
-# puts p1
-# puts r1
-#
-# init.release(r1)
-# init.scheduler
-# puts r1
+def scheduler
+  $ready_list.current.scheduler
+  print $ready_list.current.pid + ' '
+  $stdout.flush
+end
 
-ready_list.debug
+def init
+  $ready_list = ReadyList.new
+  MyProcess.init($ready_list)
+  MyResource.init
+  init = MyProcess.new('init', 0, nil)
+  $ready_list.add(init)
+  init.run
+
+  scheduler
+end
+
+def create(pid, priority)
+  current = $ready_list.current
+  p = MyProcess.new(pid, priority, current)
+  $ready_list.add(p)
+
+  scheduler
+end
+
+def destroy(pid)
+
+end
+
+def to
+  current = $ready_list.current
+  current.timeout
+
+  scheduler
+end
+
+def req(rid, demand)
+  current = $ready_list.current
+  resource = MyResource.get(rid)
+  current.req(resource, demand)
+
+  scheduler
+end
+
+init
+create('x', 1)
+create('y', 1)
+req('R1', 1)
+to
+req('R1', 1)
+
+
+
+$ready_list.debug
