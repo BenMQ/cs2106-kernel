@@ -1,0 +1,16 @@
+cr a 2
+cr a 1
+
+init
+cr a 2
+cr b 0
+
+init
+cr a 2
+req R2 2
+cr b 2
+to
+req R2 1
+rel R2 1
+to
+de a

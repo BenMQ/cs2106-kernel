@@ -1,0 +1,18 @@
+cr a 2
+cr b 2
+cr c 2
+cr d 2
+req R4 4
+to
+req R4 1
+req R4 2
+req R4 1
+rel R4 3
+to
+to
+rel R4 1
+to
+to
+to
+rel R4 1
+de b

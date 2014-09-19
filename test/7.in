@@ -1,0 +1,25 @@
+cr a 2
+req R4 4
+cr b 2
+to
+req R3 3
+cr c 2
+cr d 2
+to
+to
+req R3 1
+req R3 1
+to
+de a
+cr a 2
+req R4 4
+cr b 2
+to
+req R3 3
+cr c 2
+cr d 2
+to
+to
+req R3 1
+req R3 1
+to

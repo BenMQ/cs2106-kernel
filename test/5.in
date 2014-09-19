@@ -1,0 +1,33 @@
+cr a 2
+cr b 2
+cr c 2
+cr d 2
+to
+to
+to
+to
+req R1 1
+req R2 3
+
+init
+cr a 2
+cr b 2
+cr c 2
+to
+cr j 1
+req R2 2
+to
+cr e 1
+cr d 1
+req R2 1
+req R1 1
+to
+req R1 1
+req R2 1
+req R3 3
+req R2 1
+req R2 1
+req R2 1
+de b
+to
+de f
