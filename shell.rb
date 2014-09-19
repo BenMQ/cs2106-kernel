@@ -3,9 +3,7 @@ require_relative 'init_process'
 require_relative 'my_resource'
 require_relative 'ready_list'
 
-
 $ready_list = nil
-
 
 def scheduler
   $ready_list.current.scheduler
@@ -24,7 +22,7 @@ def init
   scheduler
 end
 
-def create(pid, priority)
+def cr(pid, priority)
   current = $ready_list.current
   p = MyProcess.new(pid, priority, current)
   $ready_list.add(p)
@@ -32,7 +30,7 @@ def create(pid, priority)
   scheduler
 end
 
-def destroy(pid)
+def de(pid)
   target = MyProcess.get(pid)
   current = $ready_list.current
   if current.is_parent_of target
@@ -40,6 +38,8 @@ def destroy(pid)
   else
     raise 'Target is not a child'
   end
+
+  scheduler
 end
 
 def to
@@ -49,22 +49,41 @@ def to
   scheduler
 end
 
-def req(rid, demand)
+def req(rid, units)
   current = $ready_list.current
   resource = MyResource.get(rid)
-  current.req(resource, demand)
+  current.req(resource, units)
 
   scheduler
 end
 
+def rel(rid, units)
+  current = $ready_list.current
+  resource = MyResource.get(rid)
+  current.release(resource, units)
+
+  scheduler
+end
+
+
 init
-create('x', 1)
-create('y', 2)
-destroy('x')
-req('R1', 1)
-to
-req('R1', 1)
 
-
-
-$ready_list.debug
+while line=gets
+  command = line.chomp.split(' ')
+  case command[0]
+    when 'cr'
+      cr command[1], command[2].to_i
+    when 'de'
+      de command[1]
+    when 'to'
+      to
+    when 'req'
+      req command[1], command[2].to_i
+    when 'rel'
+      rel command[1], command[2].to_i
+    when 'init'
+      puts ''
+      init
+  end
+end
+puts ''

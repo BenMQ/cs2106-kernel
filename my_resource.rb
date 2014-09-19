@@ -24,12 +24,16 @@ class MyResource
     @@resources[rid]
   end
 
+  def remove(process)
+    @waiting_list.delete(process)
+  end
   def allocate(demand)
     @free -= demand
   end
 
   def release(amount)
     @free += amount
+    try_allocate_next
   end
 
   def queue(process, demand)
@@ -39,7 +43,7 @@ class MyResource
   # Attempt to allocate resources to the next pending process
   # in the waiting list, as long as the first process requires
   # less than or equals to what is currently available
-  def try_allocate
+  def try_allocate_next
     while not @waiting_list.empty? and @waiting_list.first[1] <= @free do
       first = @waiting_list.pop
       first[0].req(self, first[1])

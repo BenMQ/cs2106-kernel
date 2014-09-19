@@ -25,7 +25,7 @@ class MyProcess
   def initialize(pid, priority, parent)
     #TODO: check for duplicate PID, erroneous priority
     @pid = pid
-    @other_resources = []
+    @other_resources = {}
     @status = :ready
     @status_list = nil
     @parent = parent
@@ -69,38 +69,60 @@ class MyProcess
   end
 
   def destroy
+    # Recursively destroy children first
     @children.each do |p|
       p.destroy
     end
-    @other_resources.each do |r|
-      release(r)
+
+    # Release all resources
+    @other_resources.each_pair do |rid, units|
+      release_by_rid(rid, units)
     end
-    @status = :destroyed
-    @@ready_list.remove(self)
+
+    # Remove pointers in status_list
+    if @status == :blocked
+      @status_list.delete_if {|a| a[0] == self}
+    else
+      @status_list.remove(self)
+    end
+
+    # Remove pointers in children list
+    @parent.children.delete(self)
+
+    # Release PID
     @@processes.delete(@pid)
+
+    @status = :destroyed
   end
 
-  def req(resource, demand)
-    if resource.free >= demand
-      resource.allocate(demand)
-      @other_resources.push([resource, demand])
+  def req(resource, units)
+    if resource.free >= units
+      resource.allocate(units)
+      if @other_resources[resource.rid]
+        @other_resources[resource.rid] += units
+      else
+        @other_resources[resource.rid] = units
+      end
     else
       @status = :blocked
       @status_list.remove(self)
       @status_list = resource.waiting_list
-      resource.queue(self, demand)
+      resource.queue(self, units)
     end
   end
 
   # Release the resource that is currently allocated to the process
-  def release(resource)
-    # FIXME: add number of units to be released
-    # TODO: Check if resource is allocated to this process currently
-    allocated = @other_resources.select { |alloc| alloc[0] == resource }
-    allocated.each { |alloc| resource.release(alloc[1]) }
-    @other_resources.delete_if { |alloc| alloc[0] == resource }
+  def release(resource, units)
+    if @other_resources.has_key?(resource.rid) and @other_resources[resource.rid] >= units
+      resource.release(units)
+      @other_resources[resource.rid] -= units
+    else
+      raise 'Requested number of units to release is less than total number of units allocated'
+    end
+  end
 
-    resource.try_allocate
+  def release_by_rid(rid, units)
+    release(MyResource.get(rid), units)
   end
 
   def scheduler
