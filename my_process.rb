@@ -1,5 +1,7 @@
 class MyProcess
   @@ready_list = nil
+
+  # Hash of all processes keyed by their PID
   @@processes = {}
   attr_accessor :pid, :other_resources, :status, :status_list, :parent, :children, :priority, :ready_list
 
@@ -15,7 +17,14 @@ class MyProcess
   # Initialise a process with given pid, priority and (optionally) a parent
   # The newly created process has a default status of ready
   def initialize(pid, priority, parent)
-    #TODO: check for duplicate PID, erroneous priority
+    if not priority.between?(0, Const::MAX_PRIORITY)
+      raise 'Invalid priority'
+    end
+
+    if @@processes.has_key?(pid)
+      raise 'Duplicate PID'
+    end
+
     @pid = pid
     @other_resources = {}
     @status = :ready
@@ -34,13 +43,17 @@ class MyProcess
     @children.push(child)
   end
 
-  def is_parent_of(child)
+  # Check if self is parent of another process
+  # Recursively checks the child's parent until
+  # 1) Self is reached, hence it's a ancestor
+  # 2) Nil is reached (root of the creation tree), hence it's not a ancestor
+  def is_ancestor_of(child)
     if child.parent.nil?
       false
     elsif child == self
       true
     else
-      is_parent_of child.parent
+      is_ancestor_of child.parent
     end
   end
 
@@ -87,7 +100,12 @@ class MyProcess
     @status = :destroyed
   end
 
+  # request x units from a given resource
   def req(resource, units)
+    if units < 0
+      raise 'Invalid units to request'
+    end
+
     if resource.free >= units
       resource.allocate(units)
       if @other_resources[resource.rid]
@@ -105,6 +123,10 @@ class MyProcess
 
   # Release the resource that is currently allocated to the process
   def release(resource, units)
+    if units < 0
+      raise 'Invalid units to request'
+    end
+
     if @other_resources.has_key?(resource.rid) and @other_resources[resource.rid] >= units
       resource.release(units)
       @other_resources[resource.rid] -= units
@@ -113,6 +135,7 @@ class MyProcess
     end
   end
 
+  # Helper when deleting a process
   def release_by_rid(rid, units)
     release(MyResource.get(rid), units)
   end
@@ -120,8 +143,11 @@ class MyProcess
   def scheduler
     highest = @@ready_list.highest_priority
     if @priority < highest.priority || @status != :running
+      # status is running because
+      # 1) A timeout is issued
+      # 2) A new process with higher priority is created
       if @status == :running
-        timeout
+        @status = :ready
       end
       highest.run
     end

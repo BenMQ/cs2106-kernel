@@ -23,6 +23,7 @@ def init
 end
 
 def cr(pid, priority)
+  raise 'Invalid priority' unless priority.between?(1, Const::MAX_PRIORITY)
   current = $ready_list.current
   p = MyProcess.new(pid, priority, current)
   $ready_list.add(p)
@@ -33,7 +34,7 @@ end
 def de(pid)
   target = MyProcess.get(pid)
   current = $ready_list.current
-  if current.is_parent_of target
+  if current.is_ancestor_of target
     target.destroy
   else
     raise 'Target is not a child'
@@ -52,6 +53,9 @@ end
 def req(rid, units)
   current = $ready_list.current
   resource = MyResource.get(rid)
+  if resource.units < units
+    raise 'Requesting more units than total units for the resource'
+  end
   current.req(resource, units)
 
   scheduler
@@ -69,21 +73,25 @@ end
 init
 
 while line=gets
-  command = line.chomp.split(' ')
-  case command[0]
-    when 'cr'
-      cr command[1], command[2].to_i
-    when 'de'
-      de command[1]
-    when 'to'
-      to
-    when 'req'
-      req command[1], command[2].to_i
-    when 'rel'
-      rel command[1], command[2].to_i
-    when 'init'
-      puts ''
-      init
+  begin
+    command = line.chomp.split(' ')
+    case command[0]
+      when 'cr'
+        cr command[1], command[2].to_i
+      when 'de'
+        de command[1]
+      when 'to'
+        to
+      when 'req'
+        req command[1], command[2].to_i
+      when 'rel'
+        rel command[1], command[2].to_i
+      when 'init'
+        puts ''
+        init
+    end
+  rescue
+    print 'error '
   end
 end
 puts ''
