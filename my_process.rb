@@ -1,15 +1,7 @@
 class MyProcess
   @@ready_list = nil
   @@processes = {}
-  attr_accessor :pid, :other_resources, :status, :status_list, :parent, :children, :priority
-
-  def self.ready_list=(ready_list)
-     @@ready_list = ready_list
-  end
-
-  def self.ready_list
-    @@ready_list
-  end
+  attr_accessor :pid, :other_resources, :status, :status_list, :parent, :children, :priority, :ready_list
 
   def self.init(ready_list)
     @@ready_list = ready_list
